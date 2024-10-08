@@ -1,56 +1,49 @@
 import pandas as pd
 import numpy as np
-import warnings
-
-warnings.filterwarnings('ignore')
 
 '''
-Handling missing values is an essential part of data preprocessing in any machine learning project. 
-Let's create a sample example using Python to demonstrate how to handle missing values in a 
-dataset of movie attributes.
+Explanation
+Original DataFrame: Displays the movie data with missing values.
+Missing Values Count: Shows how many missing values are present in each column.
+Handling Missing Values:
+The Genre column replaces missing values with 'Unknown'.
+The Rating column fills missing values with the mean rating.
+The Release Year column fills missing values with the most common year (mode).
+The Runtime column fills missing values with the median runtime.
 '''
 
-# Generate synthetic movie data with missing values
-np.random.seed(0)
-
-num_movies = 1000
-
-# Sample movie data with missing values
+# Sample dataset with missing values
 data = {
-    'Title': [f'Movie {i+1}' for i in range(num_movies)],
-    'Genre': np.random.choice(['Action', 'Comedy', 'Drama', 'Sci-Fi', 'Thriller'], size=num_movies),
-    'Director': np.random.choice(['Director A', 'Director B', 'Director C', 'Director D', 'Director E', np.nan], size=num_movies),
-    'Production_Company': np.random.choice(['Company X', 'Company Y', 'Company Z', np.nan], size=num_movies),
-    'Budget_Millions': np.random.randint(1, 100, size=num_movies),
-    'Box_Office_Revenue_Millions': np.random.randint(1, 1000, size=num_movies),
-    'Release_Date': pd.date_range(start='2010-01-01', periods=num_movies, freq='D'),
-    'Duration_Minutes': np.random.randint(60, 240, size=num_movies),
-    'Rating': np.random.uniform(1, 10, size=num_movies).round(1),
-    'Language': np.random.choice(['English', 'French', 'Spanish', 'German', np.nan], size=num_movies),
-    'Country': np.random.choice(['USA', 'UK', 'France', 'Germany', 'Canada', np.nan], size=num_movies),
-    'Awards_Won': np.random.randint(0, 5, size=num_movies),
-    'IMDB_Rating': np.random.uniform(1, 10, size=num_movies).round(1)
+    'Movie': ['Movie A', 'Movie B', 'Movie C', 'Movie D', 'Movie E'],
+    'Genre': ['Action', 'Comedy', np.nan, 'Drama', 'Comedy'],
+    'Rating': [8.0, np.nan, 9.0, 6.5, 7.0],
+    'Release_Year': [2010, 2015, 2010, np.nan, 2015],
+    'Runtime': [120, 95, 110, 130, np.nan]
 }
 
-# Introducing missing values
-for col in ['Director', 'Production_Company', 'Language', 'Country']:
-    data[col] = np.where(np.random.rand(num_movies) < 0.1, np.nan, data[col])
-
-# Create DataFrame
 df = pd.DataFrame(data)
+print("Original DataFrame:")
+print(df)
 
-# Drop rows with any missing values
-df_dropna = df.dropna()
+# Check for missing values
+print("\nMissing Values Count:")
+print(df.isnull().sum())
 
-# Fill missing values in numerical columns with mean
-df['Budget_Millions'].fillna(df['Budget_Millions'].mean(), inplace=True)
+# Fill missing values
+df['Genre'].fillna('Unknown', inplace=True)  # Replace missing genres with 'Unknown'
+df['Rating'].fillna(df['Rating'].mean(), inplace=True)  # Fill missing ratings with the mean rating
+df['Release_Year'].fillna(df['Release_Year'].mode()[0], inplace=True)  # Fill with the most common year
+df['Runtime'].fillna(df['Runtime'].median(), inplace=True)  # Fill missing runtime with the median
 
-# Fill missing values in categorical columns with the most frequent value
-for col in ['Director', 'Production_Company', 'Language', 'Country']:
-    df[col].fillna(df[col].mode()[0], inplace=True)
+print("\nDataFrame after handling missing values:")
+print(df)
 
-# Display the first few rows after filling missing values
-print("\nDataFrame after filling missing values in categorical columns:")
-print(df.head())
+'''
+Output
+When you run this code, you will see:
+The original DataFrame printed with missing values.
+A count of missing values in each column.
+The DataFrame after handling missing values, showing how the missing entries have been filled.
+'''
 
 
